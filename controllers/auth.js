@@ -12,8 +12,23 @@ export const register = async (req,res)=>{
                 message: 'This username is already taken'
             })
         }
-    } catch (error){
 
+        const salt = bcrypt.genSaltSync(10)
+        const hash = await bcrypt.hash(password, salt)
+
+        const newUser = new User({
+            username,
+            password: hash,
+        })
+
+        await newUser.save()
+
+        res.json({
+            newUser, message : 'Succes! Registered successfully ! '
+        })
+
+    } catch (error){
+        res.json({message: 'error, please wait or come later...'})
     }
 }
 
