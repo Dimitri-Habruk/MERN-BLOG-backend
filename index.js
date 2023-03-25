@@ -17,7 +17,7 @@ const dbName = process.env.DB_NAME
 app.use(cors())
 app.use(express.json())
 
-// Routes
+// Routes -
 app.use('/api/auth', authRoute)
 
 async function start() {
