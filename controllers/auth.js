@@ -1,5 +1,6 @@
 import User from '../models/User.js'
 import bcrypt from 'bcryptjs'
+import jwt  from 'jsonwebtoken'
 
 // Register user
 export const register = async (req,res)=>{
@@ -7,8 +8,9 @@ export const register = async (req,res)=>{
         const {username, password} = req.body
 
         const isUser = await User.findOne({username})
+
         if(isUser){
-            res.status(402).json({
+            return res.json({
                 message: 'This username is already taken'
             })
         }
@@ -24,19 +26,47 @@ export const register = async (req,res)=>{
         await newUser.save()
 
         res.json({
-            newUser, message : 'Succes! Registered successfully ! '
+            newUser, 
+            message : 'Succes! Registered successfully ! '
         })
 
     } catch (error){
-        res.json({message: 'error, please wait or come later...'})
+        res.json({message: 'error, user can not be registered'})
     }
 }
 
 // Login user
 export const login = async (req,res)=>{
     try{
+        const {username, password} = req.body
+        const user = await User.findOne({username})
+
+        if(!user){
+            return res.json({
+                message: "This user doesn't exist"
+            })
+        }
+
+        const isPasswordCorrect = await bcrypt.compare(password, user.password)
+
+        if(!isPasswordCorrect){
+            return res.json({
+                message: 'password is incorrect'
+            })
+        } 
+
+        const token = jwt.sign({
+            id: user._id
+        },
+        process.env.JWT_SECRET,
+        {expiresIn: '30d'})
+
+        res.json({
+            token,user,message :'You have successfully logged in'
+        })
 
     } catch (error){
+        res.json({message: 'Log in error'})
         
     }
 }
