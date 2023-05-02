@@ -31,7 +31,7 @@ export const register = async (req,res)=>{
         })
 
     } catch (error){
-        res.json({message: 'error, user can not be registered'})
+        res.json({message: 'error, user can not be registered.'})
     }
 }
 
@@ -71,11 +71,24 @@ export const login = async (req,res)=>{
     }
 }
 
-// Get me
+// Get me = pour eviter la deconnection si on fait F5
 export const getMe = async (req,res)=>{
     try{
+        const user = await User.findById(req.userId)
 
+        if(!user){
+            return res.json({message: "This user doesn't exist."})
+        }
+
+        const token = jwt.sign({
+            id: user._id
+        },
+        process.env.JWT_SECRET,
+        {expiresIn: '30d'})
+
+        res.json({user,token})        
     } catch (error){
-        
+        res.json({message: 'Access denied'})
+
     }
 }
