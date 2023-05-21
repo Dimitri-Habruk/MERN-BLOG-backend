@@ -33,6 +33,7 @@ export const register = async (req,res)=>{
 
         res.json({
             newUser, 
+            token,
             message : 'Succes! Registered successfully ! '
         })
 
